@@ -38,7 +38,8 @@ def get_latest_data():
         result["columns"] = columns
         result["rows"] = rows
 
-        return columns, rows
+        #return columns, rows
+        return result
     except Exception as e:
         result["success"] = False
         result["message"] = f"資料庫查詢失敗:{e}"
@@ -69,3 +70,5 @@ def open_db():
 
 
 print(get_latest_data())
+print(open_db())
+
