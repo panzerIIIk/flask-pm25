@@ -234,22 +234,27 @@
 </head>
 
 <body>
+  {% if data %}
   <h1>🌫 PM2.5 即時空氣品質監測</h1>
 
   <p>資料來源：環境部即時 API</p>
-  <p>🕒 資料更新時間：<span id="update-time">
-    </span>
+  <p>🕒 資料更新時間：<span id="update-time">{{data.datetime}}</span>
   </p>
 
   <div class="kpi-card higher">
     <span class="kpi-label">🚩 最高測站</span>
-    <span class="kpi-value"> <small>μg/m³</small></span>
+    <span class="kpi-value"> {{data.max[0]}} | {{data.max[1]}} <small>μg/m³</small></span>
   </div>
 
   <div class="kpi-card lower">
     <span class="kpi-label">✅ 最低測站</span>
-    <span class="kpi-value"> <small>μg/m³</small></span>
+    <span class="kpi-value">{{data.min[0]}} | {{data.min[1]}} <small>μg/m³</small></span>
   </div>
+  {% else %}
+  <span>class="kpi-value">資料取得失敗!</span>
+  {% endif %}
+
+
   </div>
   <div class="table-container">
     <table>
@@ -288,8 +293,27 @@
   </div>
   <script>
     const countiesEl = document.querySelector("#counties")
+    const sixcountybtnEl = document.querySelector("#btn-six-avg")
     const countyCtx = document.querySelector("#pm25Chart")
-    console.log(countiesEl)
+    console.log(countiesEl, sixcountybtnEl);
+
+    sixcountybtnEl.addEventListener("click", (e) => {
+
+      fetch(`/api/data/six-county`)
+        .then(res => res.json())
+        .then(data => {
+          const labels = data.labels;
+          const values = data.values;
+
+          console.log(labels, values);
+          myChart.data.labels = labels;
+          myChart.data.datasets[0].label = `六都PM2.5平均值`;
+          myChart.data.datasets[0].data = values;
+          myChart.data.datasets[0].backgroundColor = 'rgba(255, 255, 255, 1)';
+          myChart.data.datasets[0].borderColor = 'rgba(128, 0, 128, 1)';
+          myChart.update();
+        })
+    })
 
     countiesEl.addEventListener("change", (e) => {
       let county = countiesEl.value;
